@@ -2,18 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 import urllib.request
 import re
+import json
 
-def get_quote_text(each_quote):
+def get_quote_text(each_quote):    ## to get quote text for each quote for all pages
     quote_element = each_quote.find('span',attrs={'class':'text'})
-    quote=quote_element.getText()
-    return quote
+    quote= quote_element.getText()
+    quote_a = quote.strip(' " ')
+    return quote_a
 
-def get_author_of_quote(each_quote):
+def get_author_of_quote(each_quote):   ## to get author name of each quote for all pages
     author_element = each_quote.find("small",attrs={'class':'author'})
     author=author_element.getText()
     return author
 
-def get_tags_list(each_quote):
+def get_tags_list(each_quote):     ## to get tags list for each quote for all pages
     tags_container = each_quote.find('div',attrs={'class':'tags'})
     list_of_tag_ele = tags_container.find_all('a',attrs={'class':'tag'})
     list_of_tags = []
@@ -22,7 +24,7 @@ def get_tags_list(each_quote):
     return list_of_tags
         
         
-def get_list_of_quotes(data):
+def get_list_of_quotes(data):     ## to get list of all quotes for a page
     soup = BeautifulSoup(data, 'html.parser')
     list_of_all_quotes_containers = soup.find_all('div', attrs={'class': 'quote'})
     list_of_sub_quotes = []
@@ -35,7 +37,7 @@ def get_list_of_quotes(data):
         list_of_quotes.append(quote_dict)
     return list_of_sub_quotes
 
-def get_author_details(author_data,author_url):
+def get_author_details(author_data,author_url):   ## to get author details in about author page
     soup = BeautifulSoup(author_data, 'html.parser')
     author_page_content = soup.find('div',attrs={'class':'author-details'})
     author_name_element = author_page_content.find('h3',attrs={'class':'author-title'})
@@ -47,10 +49,10 @@ def get_author_details(author_data,author_url):
         'born':born_details,
         'reference':author_url
     }
-    return author_details
+    return(author_details)
 
 
-def get_list_of_authors(data):
+def get_list_of_authors(data):    ## to get list of all auther details for a page
     soup = BeautifulSoup(data, 'html.parser')
     list_of_all_authors_containers = soup.find_all('div', attrs={'class': 'quote'})
     list_of_sub_authors = []
@@ -64,20 +66,28 @@ def get_list_of_authors(data):
     return list_of_sub_authors
 
 
-
 page = 1
 list_of_quotes = []
 list_of_authors = []
-while page <= 10:
+while page <= 10:       ## iterating over each page 
     try:
         url = "http://quotes.toscrape.com/page/" + str(page) + "/"
+
+        data = urllib.request.urlopen(url)
+        list_of_sub_authors = get_list_of_authors(data)
+        list_of_authors.extend(list_of_sub_authors)
+
         data = urllib.request.urlopen(url)
         list_of_sub_quotes = get_list_of_quotes(data)
-        list_of_sub_authors = get_list_of_authors(data)
         list_of_quotes.extend(list_of_sub_quotes)
-        list_of_authors.extend(list_of_sub_authors)
         page += 1
     except:
         break
 
-print(len(list_of_authors))
+quotes_author_object = {
+    'quotes' : list_of_quotes,
+    'authors': list_of_authors
+}
+
+json_object = json.dumps(quotes_author_object)
+print(list_of_quotes[0])
