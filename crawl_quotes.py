@@ -32,7 +32,7 @@ def get_list_of_quotes(data):     ## to get list of all quotes for a page
         quote_dict = {
             'quote':get_quote_text(each_quote),
             'author':get_author_of_quote(each_quote),
-            'tags_list':get_tags_list(each_quote)
+            'tags':get_tags_list(each_quote)
         }
         list_of_quotes.append(quote_dict)
     return list_of_sub_quotes
@@ -90,4 +90,4 @@ quotes_author_object = {
 }
 
 json_object = json.dumps(quotes_author_object)
-print(list_of_quotes[0])
+print(json_object)
