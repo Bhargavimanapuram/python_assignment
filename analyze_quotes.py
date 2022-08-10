@@ -1,4 +1,5 @@
 import sqlite3
+
 def get_sqlite_connection():
     try:
         connection_obj = sqlite3.connect('quotes.db')
@@ -30,6 +31,7 @@ def get_no_of_quotations_by_author(connection_obj,author_name):
 def create_view(connection_obj):
     try:
         cursor = connection_obj.cursor()
+        cursor.execute("DROP VIEW IF EXISTS no_of_tags_per_quote")
         view_query = "CREATE VIEW no_of_tags_per_quote AS SELECT COUNT(*) AS no_of_tags,quote_id FROM quote_tags GROUP BY quote_id"
         cursor.execute(view_query)
         cursor.close()
@@ -67,5 +69,9 @@ def calling_all_functions():
     create_view(connection_obj)
     min_max_avg_of_tags = get_minimum_maximum_average_no_of_tags(connection_obj)
     top_n_authors = get_top_n_authors(connection_obj,5)
-  
+    print(no_of_quotations)
+    print(no_of_quotations_by_author)
+    print(min_max_avg_of_tags)
+    print(top_n_authors)
+
 calling_all_functions()
