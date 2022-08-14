@@ -2,13 +2,13 @@ import sqlite3
 import json
 import uuid
 
-def enable_foreign_keys():
+def enable_foreign_keys():        ## to enable foreign keys
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     cursor.execute("PRAGMA foreign_keys = ON")
     connection.commit()
 
-def create_author_table():
+def create_author_table():         ## to create author table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS author")
@@ -20,7 +20,7 @@ def create_author_table():
     );""")
     connection.commit()
 
-def create_quote_table():
+def create_quote_table():          ## to create quote table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS quote")
@@ -33,7 +33,7 @@ def create_quote_table():
     );""")
     connection.commit()
 
-def create_tag_table():
+def create_tag_table():             ## to create tag table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS tag")
@@ -45,7 +45,7 @@ def create_tag_table():
     """)
     connection.commit()
 
-def create_quote_tags_table():
+def create_quote_tags_table():          ## to create quote tags table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS quote_tags")
@@ -59,13 +59,13 @@ def create_quote_tags_table():
     );""")
     connection.commit()
 
-def get_json_data():
+def get_json_data():                 ## to get data from json object
     json_data = json.load(open('quotes.json'))
     quotes = json_data["quotes"]
     authors = json_data["authors"]
     return quotes,authors
 
-def insert_values_into_author_table(authors):
+def insert_values_into_author_table(authors):         ## insert values into author table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     for i in range(len(authors)):
@@ -74,7 +74,7 @@ def insert_values_into_author_table(authors):
         cursor.execute(""" INSERT INTO author(id,author_name,author_born_details) VALUES (?,?,?)""", tuple_of_values)
         connection.commit()
 
-def get_forien_key_value_of_author_id(author_name):
+def get_forien_key_value_of_author_id(author_name):      ## to get author id foreign key 
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     statement = "SELECT id from author WHERE author_name = ?"
@@ -82,7 +82,7 @@ def get_forien_key_value_of_author_id(author_name):
     author_id, = cursor.fetchone()
     return author_id
 
-def insert_values_into_quote_table(quotes):
+def insert_values_into_quote_table(quotes):        ## insert values in to quote table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     for i in range(len(quotes)):
@@ -94,7 +94,7 @@ def insert_values_into_quote_table(quotes):
         cursor.execute(""" INSERT INTO quote(id,quote,author_id) VALUES (?,?,?)""", (id,quote,author_id))
         connection.commit()
 
-def get_unique_tags_list(quotes):
+def get_unique_tags_list(quotes):        ## to get unique tags list
     unique_tags_list = []
     for quote in quotes:
         tags_list = quote['tags']
@@ -103,7 +103,7 @@ def get_unique_tags_list(quotes):
                 unique_tags_list.append(tag)
     return unique_tags_list
 
-def insert_values_into_tag_table(unique_tags_list):
+def insert_values_into_tag_table(unique_tags_list):      ## insert values into tag table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     id = 1
@@ -113,22 +113,20 @@ def insert_values_into_tag_table(unique_tags_list):
         cursor.execute(""" INSERT INTO tag(id,tag_name) VALUES (?,?)""", tuple_of_values)
         connection.commit()
 
-def get_tag_id_of_a_tag(tag):
+def get_tag_id_of_a_tag(tag):       ## to get tag id foreign key
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     cursor.execute(""" SELECT id FROM tag WHERE tag_name = ?""",(tag,))
     tag_id, = cursor.fetchone()
     return tag_id
 
-
-def insert_values_into_quote_tags_table(quote_id,tags_list_of_quote):
+def insert_values_into_quote_tags_table(quote_id,tags_list_of_quote):     ## insert values into quote tags table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     for tag in tags_list_of_quote:
         id = str(uuid.uuid4())
         tag_id = get_tag_id_of_a_tag(tag)
-        tuple_of_values = (id,tag_id,quote_id)
-        cursor.execute(""" INSERT INTO quote_tags(id,tag_id,quote_id) VALUES (?,?,?)""", tuple_of_values)
+        cursor.execute(""" INSERT INTO quote_tags(id,tag_id,quote_id) VALUES (?,?,?)""", (id,tag_id,quote_id))
         connection.commit()
 
 def get_and_insert_list_of_tags_of_each_quote(quotes):
@@ -153,8 +151,3 @@ def calling_all_functions():
     
 calling_all_functions()
 
-connection = sqlite3.connect('quotes.db')
-cursor = connection.cursor()
-data = cursor.execute("SELECT * from quote_tags")
-for row in data:
-    print(row)
