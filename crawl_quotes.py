@@ -21,45 +21,12 @@ def get_tags_list(each_quote):     ## to get tags list for each quote for all pa
         list_of_tags.append(element.getText())
     return list_of_tags
         
-def get_quote_object(each_quote):    ## to get quote object for each quote
-    quote_object = {
-        'quote':get_quote_text(each_quote),
-        'author':get_author_of_quote(each_quote),
-        'tags':get_tags_list(each_quote)
-    }
-    return(quote_object)
-
-def get_quotes_of_each_page(soup):        ## to get list of quotes for a page
-    quotes_containers = soup.find_all('div', attrs={'class': 'quote'})
-    list_of_quotes_for_a_page = []
-    for each_quote in quotes_containers:
-        quote_object = get_quote_object(each_quote)
-        list_of_quotes_for_a_page.append(quote_object)
-    return list_of_quotes_for_a_page
-
 def get_author_link_and_name(each_quote):      ## get author link and name for each quote
     quote_anchor_elements = each_quote.find_all('a')
     author_link = quote_anchor_elements[0].get('href')
     author_name = get_author_of_quote(each_quote)
     author_link_object = {"author_link":author_link,"author_name":author_name}
     return author_link_object
-
-def get_author_urls_of_page(soup):       ## get list of author links for a page
-    quotes_containers = soup.find_all('div', attrs={'class': 'quote'})
-    unique_author_links_for_page = []
-    for each_quote in quotes_containers:
-        author_link_object = get_author_link_and_name(each_quote)
-        if author_link_object not in unique_author_links_for_page:
-            unique_author_links_for_page.append(author_link_object)
-    return unique_author_links_for_page
-
-def appending_author_links(author_links,unique_author_links_for_page):   ## appending unique author link
-    updated_author_links = []
-    updated_author_links.extend(author_links)
-    for link in unique_author_links_for_page:
-        if link not in updated_author_links:
-            updated_author_links.append(link)
-    return updated_author_links
     
 def get_born_details_of_author(author_link_item):        ## get born details of an author
     url = "http://quotes.toscrape.com" + author_link_item['author_link'] + "/"
@@ -85,6 +52,39 @@ def get_author_details(author_links):   ## to get author details in about author
         author_object = get_author_object(author_link_item,born_details)
         list_of_authors.append(author_object)
     return list_of_authors
+
+def get_quote_object(each_quote):    ## to get quote object for each quote
+    quote_object = {
+        'quote':get_quote_text(each_quote),
+        'author':get_author_of_quote(each_quote),
+        'tags':get_tags_list(each_quote)
+    }
+    return(quote_object)
+
+def get_author_urls_of_page(soup):       ## get list of author links for a page
+    quotes_containers = soup.find_all('div', attrs={'class': 'quote'})
+    unique_author_links_for_page = []
+    for each_quote in quotes_containers:
+        author_link_object = get_author_link_and_name(each_quote)
+        if author_link_object not in unique_author_links_for_page:
+            unique_author_links_for_page.append(author_link_object)
+    return unique_author_links_for_page
+
+def get_quotes_of_each_page(soup):        ## to get list of quotes for a page
+    quotes_containers = soup.find_all('div', attrs={'class': 'quote'})
+    list_of_quotes_for_a_page = []
+    for each_quote in quotes_containers:
+        quote_object = get_quote_object(each_quote)
+        list_of_quotes_for_a_page.append(quote_object)
+    return list_of_quotes_for_a_page
+
+def appending_author_links(author_links,unique_author_links_for_page):   ## appending unique author link
+    updated_author_links = []
+    updated_author_links.extend(author_links)
+    for link in unique_author_links_for_page:
+        if link not in updated_author_links:
+            updated_author_links.append(link)
+    return updated_author_links
 
 def access_quote_author_page(url):   ## get list of quotes for a page 
     data = urllib.request.urlopen(url)
