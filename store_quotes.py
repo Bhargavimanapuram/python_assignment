@@ -82,16 +82,21 @@ def get_forien_key_value_of_author_id(author_name):      ## to get author id for
     author_id, = cursor.fetchone()
     return author_id
 
+def get_values_to_insert_into_quote_table(i,required_quote):   ## to get values to insert into quote table
+    id = i+1
+    quote = required_quote["quote"]
+    author_name = required_quote["author"]
+    author_id = get_forien_key_value_of_author_id(author_name)
+    tuple_of_values = (id,quote,author_id)
+    return tuple_of_values
+
 def insert_values_into_quote_table(quotes):        ## insert values in to quote table
     connection = sqlite3.connect('quotes.db')
     cursor = connection.cursor()
     for i in range(len(quotes)):
         required_quote = quotes[i]
-        id = i+1
-        quote = required_quote["quote"]
-        author_name = required_quote["author"]
-        author_id = get_forien_key_value_of_author_id(author_name)
-        cursor.execute(""" INSERT INTO quote(id,quote,author_id) VALUES (?,?,?)""", (id,quote,author_id))
+        tuple_of_values = get_values_to_insert_into_quote_table(i,required_quote)
+        cursor.execute(""" INSERT INTO quote(id,quote,author_id) VALUES (?,?,?)""", tuple_of_values)
         connection.commit()
 
 def get_unique_tags_list(quotes):        ## to get unique tags list
